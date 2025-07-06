@@ -3,6 +3,7 @@ package com.example.external
 import io.lettuce.core.api.async.RedisAsyncCommands
 import kotlinx.coroutines.future.await
 import java.time.ZonedDateTime
+import kotlin.time.Duration
 
 class WriteRedisService(
     private val redisAsyncCommands: RedisAsyncCommands<String, String>,
@@ -11,6 +12,12 @@ class WriteRedisService(
         key: String,
         value: String,
     ): String = redisAsyncCommands.set(key, value).await()
+
+    suspend fun set(
+        key: String,
+        value: String,
+        expiration: Duration,
+    ): String = redisAsyncCommands.setex(key, expiration.inWholeSeconds, value).await()
 
     suspend fun increase(
         key: String,
