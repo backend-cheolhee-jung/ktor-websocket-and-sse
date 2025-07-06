@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation("org.redisson:redisson:3.50.0")
+    implementation("io.github.oshai:kotlin-logging:5.1.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.1")
     implementation("com.github.lolmageap.ktor-server-extension:redis-cache:1.0.5")
     implementation("com.github.lolmageap.ktor-server-extension:scheduler:1.0.5")
