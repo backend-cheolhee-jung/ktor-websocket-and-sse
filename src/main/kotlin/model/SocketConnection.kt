@@ -1,7 +1,9 @@
 package com.example.model
 
 import io.ktor.server.websocket.DefaultWebSocketServerSession
+import kotlinx.coroutines.sync.Mutex
 
+val socketConnectionsMutex = Mutex()
 val currentSocketConnections = HashSet<SocketConnection>()
 val previousSocketConnections = HashSet<SocketConnection>()
 

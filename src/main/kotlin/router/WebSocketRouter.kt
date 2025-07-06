@@ -2,10 +2,10 @@ package com.example.router
 
 import com.example.model.SocketConnection
 import com.example.model.currentSocketConnections
+import com.example.model.socketConnectionsMutex
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
 
@@ -20,8 +20,6 @@ import java.util.*
  * 6. 이 부분은 event publisher와 event consumer로 구현합니다.
  */
 fun Route.socket() {
-    val mutex = Mutex()
-
     webSocket("/ws") {
         val connection = SocketConnection(
             sessionId = UUID.randomUUID().toString(),
@@ -29,7 +27,7 @@ fun Route.socket() {
         )
 
         try {
-            mutex.withLock {
+            socketConnectionsMutex.withLock {
                 currentSocketConnections.add(connection)
             }
 
@@ -42,7 +40,9 @@ fun Route.socket() {
                 }
             }
         } finally {
-            currentSocketConnections.remove(connection)
+            socketConnectionsMutex.withLock {
+                currentSocketConnections.remove(connection)
+            }
         }
     }
 }
