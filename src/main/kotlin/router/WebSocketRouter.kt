@@ -1,11 +1,13 @@
 package com.example.router
 
-import com.example.external.ReadRedisService
-import com.example.external.WriteRedisService
+import com.example.model.SocketConnection
+import com.example.model.currentSocketConnections
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import org.koin.ktor.ext.inject
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.*
 
 /**
  * workflow:
@@ -18,18 +20,30 @@ import org.koin.ktor.ext.inject
  * 6. 이 부분은 event publisher와 event consumer로 구현합니다.
  */
 fun Route.socket() {
-    val redisReadService by application.inject<ReadRedisService>()
-    val writeReadService by application.inject<WriteRedisService>()
+    val mutex = Mutex()
 
     webSocket("/ws") {
-        for (frame in incoming) {
-            if (frame is Frame.Text) {
-                val text = frame.readText()
-                outgoing.send(Frame.Text("YOU SAID: $text"))
-                if (text.equals("bye", ignoreCase = true)) {
-                    close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
+        val connection = SocketConnection(sessionId = UUID.randomUUID().toString())
+        mutex.withLock {
+            currentSocketConnections.add(connection)
+        }
+
+        try {
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    val text = frame.readText()
+                    if (text.equals("bye", ignoreCase = true)) {
+                        close(
+                            CloseReason(
+                                code = CloseReason.Codes.NORMAL,
+                                message = "커넥션 종료",
+                            )
+                        )
+                    }
                 }
             }
+        } finally {
+            currentSocketConnections.remove(connection)
         }
     }
 }
