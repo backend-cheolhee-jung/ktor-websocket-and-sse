@@ -23,22 +23,21 @@ fun Route.socket() {
     val mutex = Mutex()
 
     webSocket("/ws") {
-        val connection = SocketConnection(sessionId = UUID.randomUUID().toString())
-        mutex.withLock {
-            currentSocketConnections.add(connection)
-        }
+        val connection = SocketConnection(
+            sessionId = UUID.randomUUID().toString(),
+            session = this,
+        )
 
         try {
+            mutex.withLock {
+                currentSocketConnections.add(connection)
+            }
+
             for (frame in incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
                     if (text.equals("bye", ignoreCase = true)) {
-                        close(
-                            CloseReason(
-                                code = CloseReason.Codes.NORMAL,
-                                message = "커넥션 종료",
-                            )
-                        )
+                        close(CloseReason(CloseReason.Codes.NORMAL, "커넥션 종료"))
                     }
                 }
             }

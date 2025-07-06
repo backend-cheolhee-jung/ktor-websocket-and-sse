@@ -1,13 +1,27 @@
 package com.example.event
 
-import com.example.event.event.EventConsumer
 import com.example.external.ReadRedisService
-import com.example.model.ConcurrentUserEvent
+import com.example.model.currentSocketConnections
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.websocket.Frame
 
 class ConcurrentUserEventConsumer(
     private val readRedisService: ReadRedisService,
-): EventConsumer<ConcurrentUserEvent, Long> {
-    override suspend fun receiveEvent(event: ConcurrentUserEvent): Long {
-        return readRedisService.get(event.key)?.toLong() ?: 0
+): EventConsumer {
+    private val logger = KotlinLogging.logger {}
+
+    override suspend fun receiveEvent() {
+        val event = concurrentUserChannel.receive()
+        val concurrentUserCount = readRedisService.get(event.key)?.toLong() ?: 0
+
+        currentSocketConnections.forEach { connection ->
+            try {
+                connection.session.send(
+                    Frame.Text("동접자 수: $concurrentUserCount")
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "session id: [${connection.sessionId}]에 메시지 전송 실패" }
+            }
+        }
     }
 }

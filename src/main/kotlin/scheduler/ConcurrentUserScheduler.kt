@@ -1,15 +1,31 @@
 package com.example.scheduler
 
+import com.example.event.ConcurrentUserEvent
 import com.example.event.ConcurrentUserEventPublisher
+import com.example.external.WriteRedisService
+import com.example.model.currentSocketConnections
+import com.example.model.previousSocketConnections
+import com.example.util.CONCURRENT_USER_KEY
 import extension.ktor.schedule
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureConcurrentUserScheduler() {
     val concurrentUserEventPublisher by inject<ConcurrentUserEventPublisher>()
+    val writeRedisService by inject<WriteRedisService>()
 
     schedule(1.seconds) {
-        TODO("여기서 동접자 정보 다 모아서 redis에 increaseBy or decreaseBy로 추가")
+        val addedUserSize = previousSocketConnections.size - currentSocketConnections.size
+        val addedUserAbsoluteSize = addedUserSize.absoluteValue.toLong()
+
+        if (addedUserSize > 0) writeRedisService.increaseBy(CONCURRENT_USER_KEY, addedUserAbsoluteSize)
+        else if (addedUserSize < 0) writeRedisService.decreaseBy(CONCURRENT_USER_KEY, addedUserAbsoluteSize)
+
+        previousSocketConnections.addAll(currentSocketConnections)
+        concurrentUserEventPublisher.registerEvent(
+            ConcurrentUserEvent(CONCURRENT_USER_KEY)
+        )
     }
 }
