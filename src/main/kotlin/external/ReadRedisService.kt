@@ -1,4 +1,4 @@
-package com.example.external.external
+package com.example.external
 
 import io.lettuce.core.api.async.RedisAsyncCommands
 import kotlinx.coroutines.future.await

@@ -1,7 +1,7 @@
 package com.example.plugin
 
-import com.example.external.external.ReadRedisService
-import com.example.external.external.WriteRedisService
+import com.example.external.ReadRedisService
+import com.example.external.WriteRedisService
 import com.example.property.RedisDataSource
 import io.ktor.server.application.*
 import io.lettuce.core.RedisClient
