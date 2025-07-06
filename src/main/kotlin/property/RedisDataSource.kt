@@ -1,6 +1,6 @@
 package com.example.property
 
-import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.config.*
 
 data class RedisDataSource(
     val host: String,
@@ -14,10 +14,13 @@ data class RedisDataSource(
         ) =
             with(config) {
                 RedisDataSource(
-                    host = propertyOrNull("ktor.redis.url")?.getString() ?: "localhost",
-                    port = propertyOrNull("ktor.redis.port")?.getString()?.toInt() ?: 6379,
+                    host = propertyOrNull("ktor.redis.url")?.getString() ?: DEFAULT_REDIS_HOST,
+                    port = propertyOrNull("ktor.redis.port")?.getString()?.toInt() ?: DEFAULT_REDIS_PORT,
                     password = property("ktor.database.password").getString(),
                 )
             }
+
+        const val DEFAULT_REDIS_HOST = "localhost"
+        const val DEFAULT_REDIS_PORT = 6379
     }
 }
