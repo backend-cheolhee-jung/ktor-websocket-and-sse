@@ -1,13 +1,9 @@
 package com.example
 
-import com.example.plugin.configureFrameworks
-import com.example.plugin.configureRedis
-import com.example.plugin.configureRouting
-import com.example.plugin.configureSerialization
-import com.example.plugin.configureSockets
-import com.example.plugin.redisClient
-import com.example.plugin.redisConnection
+import com.example.model.currentSocketConnections
+import com.example.plugin.*
 import com.example.scheduler.configureConcurrentUserScheduler
+import com.example.util.CONCURRENT_USER_KEY
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -23,6 +19,7 @@ fun Application.module() {
     configureConcurrentUserScheduler()
 
     monitor.subscribe(ApplicationStopPreparing) {
+        redisAsyncCommands.decrby(CONCURRENT_USER_KEY, currentSocketConnections.size.toLong())
         redisConnection.close()
         redisClient.shutdown()
     }
