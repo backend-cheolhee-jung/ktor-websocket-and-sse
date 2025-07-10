@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class HashSetChannel<T>(
-    private val channel: Channel<T> = Channel(Channel.UNLIMITED)
+    private val channel: Channel<T> = Channel(Channel.UNLIMITED),
 ) : Channel<T> by channel {
     private val seenEvents = HashSet<T>()
     private val mutex = Mutex()
