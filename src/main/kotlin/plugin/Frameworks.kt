@@ -16,5 +16,4 @@ fun Application.configureFrameworks() {
 val eventModule = module {
     single<HashSetChannel<ConcurrentUserEvent>> { HashSetChannel() }
     single<EventPublisher<ConcurrentUserEvent>> { ConcurrentUserEventPublisher() }
-    single<EventConsumer> { ConcurrentUserEventConsumer(get()) }
 }

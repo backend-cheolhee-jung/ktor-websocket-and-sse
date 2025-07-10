@@ -17,6 +17,8 @@ fun Application.module() {
     configureRouting()
     configureFrameworks()
     configureConcurrentUserScheduler()
+    configureEvent()
+    configureEventConsumer()
 
     monitor.subscribe(ApplicationStopPreparing) {
         redisAsyncCommands.decrby(CONCURRENT_USER_KEY, currentSocketConnections.size.toLong())
