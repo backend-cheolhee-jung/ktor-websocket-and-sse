@@ -8,6 +8,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.ktor.util.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
 
@@ -33,6 +34,9 @@ fun Application.configureEventConsumer() {
                         connection.session.send(
                             Frame.Text("동접자 수: $concurrentUserCount")
                         )
+                    } catch (e: ClosedSendChannelException) {
+                        logger.info { "session id: [${connection.sessionId}]이(가) 연결을 종료했습니다." }
+                        currentSocketConnections.remove(connection)
                     } catch (e: Exception) {
                         logger.error(e) { "session id: [${connection.sessionId}]에 메시지 전송 실패" }
                     }
