@@ -2,7 +2,7 @@ package com.example.router
 
 import com.example.model.SocketConnection
 import com.example.model.currentSocketConnections
-import com.example.model.socketConnectionsMutex
+import com.example.model.connectionsMutex
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -27,7 +27,7 @@ fun Route.socket() {
         )
 
         try {
-            socketConnectionsMutex.withLock {
+            connectionsMutex.withLock {
                 currentSocketConnections.add(connection)
             }
 
@@ -40,7 +40,7 @@ fun Route.socket() {
                 }
             }
         } finally {
-            socketConnectionsMutex.withLock {
+            connectionsMutex.withLock {
                 currentSocketConnections.remove(connection)
             }
         }
