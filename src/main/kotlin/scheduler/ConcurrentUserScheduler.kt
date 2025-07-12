@@ -6,6 +6,8 @@ import com.example.external.WriteRedisService
 import com.example.model.currentSocketConnections
 import com.example.model.previousSocketConnections
 import com.example.model.connectionsMutex
+import com.example.model.currentSSEConnections
+import com.example.model.previousSSEConnections
 import com.example.util.CONCURRENT_USER_KEY
 import extension.ktor.schedule
 import io.ktor.server.application.*
@@ -20,7 +22,10 @@ fun Application.configureConcurrentUserScheduler() {
 
     schedule(1.seconds) {
         connectionsMutex.withLock {
-            val addedUserSize = previousSocketConnections.size - currentSocketConnections.size
+            val currentUserSize = currentSocketConnections.size + currentSSEConnections.size
+            val previousUserSize = previousSocketConnections.size + previousSSEConnections.size
+            val addedUserSize = currentUserSize - previousUserSize
+
             val addedUserAbsoluteSize = addedUserSize.absoluteValue.toLong()
 
             if (addedUserSize > 0) writeRedisService.increaseBy(CONCURRENT_USER_KEY, addedUserAbsoluteSize)
