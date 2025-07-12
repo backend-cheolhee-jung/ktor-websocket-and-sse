@@ -1,7 +1,7 @@
 package com.example.scheduler
 
 import com.example.event.ConcurrentUserEvent
-import com.example.event.ConcurrentUserEventPublisher
+import com.example.event.EventPublisher
 import com.example.external.WriteRedisService
 import com.example.model.currentSocketConnections
 import com.example.model.previousSocketConnections
@@ -15,7 +15,7 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureConcurrentUserScheduler() {
-    val concurrentUserEventPublisher by inject<ConcurrentUserEventPublisher>()
+    val concurrentUserEventPublisher by inject<EventPublisher<ConcurrentUserEvent>>()
     val writeRedisService by inject<WriteRedisService>()
 
     schedule(1.seconds) {

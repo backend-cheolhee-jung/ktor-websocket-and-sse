@@ -5,7 +5,7 @@ import io.ktor.server.config.*
 data class RedisDataSource(
     val host: String,
     val port: Int,
-    val password: String,
+    val password: String?,
 ) {
     companion object {
         @JvmStatic
@@ -16,7 +16,7 @@ data class RedisDataSource(
                 RedisDataSource(
                     host = propertyOrNull(DEFAULT_REDIS_URL_KEY)?.getString() ?: DEFAULT_REDIS_HOST,
                     port = propertyOrNull(DEFAULT_REDIS_PORT_KEY)?.getString()?.toInt() ?: DEFAULT_REDIS_PORT,
-                    password = property(DEFAULT_REDIS_PASSWORD_KEY).getString(),
+                    password = propertyOrNull(DEFAULT_REDIS_PASSWORD_KEY)?.getString() ,
                 )
             }
 
