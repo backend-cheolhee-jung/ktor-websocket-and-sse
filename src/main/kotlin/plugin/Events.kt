@@ -33,7 +33,7 @@ fun Application.configureEventConsumer() {
                 launch {
                     try {
                         connection.session.send(
-                            Frame.Text("동접자 수: $concurrentUserCount")
+                            Frame.Text("concurrentUserCount: $concurrentUserCount")
                         )
                     } catch (e: ClosedSendChannelException) {
                         logger.info { "session id: [${connection.sessionId}]이(가) 연결을 종료했습니다." }
@@ -47,12 +47,12 @@ fun Application.configureEventConsumer() {
             currentSSEConnections.forEach { connection ->
                 launch {
                     try {
-                        connection.session.send("동접자 수: $concurrentUserCount")
+                        connection.session.send("concurrentUserCount: $concurrentUserCount")
                     } catch (e: ClosedSendChannelException) {
-                        logger.info { "SSE connection id: [${connection}]이(가) 연결을 종료했습니다." }
+                        logger.info { "SSE connection id: [${connection.sessionId}]이(가) 연결을 종료했습니다." }
                         currentSSEConnections.remove(connection)
                     } catch (e: Exception) {
-                        logger.error(e) { "SSE connection id: [${connection}]에 메시지 전송 실패" }
+                        logger.error(e) { "SSE connection id: [${connection.sessionId}]에 메시지 전송 실패" }
                     }
                 }
             }
