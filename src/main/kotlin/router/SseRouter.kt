@@ -1,8 +1,8 @@
 package com.example.router
 
 import com.example.model.SSEConnection
-import com.example.model.connectionsMutex
 import com.example.model.currentSSEConnections
+import com.example.model.sseConnectionsMutex
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
@@ -27,7 +27,7 @@ fun Route.sseRouter() {
         )
 
         try {
-            connectionsMutex.withLock {
+            sseConnectionsMutex.withLock {
                 currentSSEConnections.add(connection)
             }
             while (true) {
@@ -36,7 +36,7 @@ fun Route.sseRouter() {
         } catch (e: Exception) {
             logger.info { "SSE connection failure: $e" }
         } finally {
-            connectionsMutex.withLock {
+            sseConnectionsMutex.withLock {
                 currentSSEConnections.remove(connection)
             }
         }
