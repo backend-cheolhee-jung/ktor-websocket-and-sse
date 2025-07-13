@@ -42,7 +42,7 @@ class HashSetChannel<T>(
         }
 
     @OptIn(InternalCoroutinesApi::class)
-    override fun tryReceive(): ChannelResult<T> =
+    override fun tryReceive() =
         if (mutex.tryLock()) {
             try {
                 channel.tryReceive().also { element ->

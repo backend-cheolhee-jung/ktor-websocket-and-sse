@@ -19,7 +19,7 @@ import java.util.*
  * 5. 레디스에 increment, decrement가 끝나면 socket에 연결된 사용자들에게 현재 동접자가 몇명인지 발송해줍니다.
  * 6. 이 부분은 event publisher와 event consumer로 구현합니다.
  */
-fun Route.socket() {
+fun Route.socketRouter() {
     webSocket("/ws") {
         val connection = SocketConnection(
             sessionId = UUID.randomUUID().toString(),
