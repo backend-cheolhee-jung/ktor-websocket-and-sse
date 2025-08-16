@@ -9,13 +9,18 @@ import kotlinx.coroutines.sync.withLock
 class HashSetChannel<T>(
     private val channel: Channel<T> = Channel(Channel.UNLIMITED),
 ) : Channel<T> by channel {
-    private val seenEvents = HashSet<T>()
+    private val seenEvents = LinkedHashSet<T>()
     private val mutex = Mutex()
 
     override suspend fun send(element: T) {
         mutex.withLock {
             if (seenEvents.add(element)) {
                 channel.send(element)
+            }
+
+            if (seenEvents.size > EVENT_LIMIT) {
+                val oldest = seenEvents.iterator().next()
+                seenEvents.remove(oldest)
             }
         }
     }
@@ -54,4 +59,8 @@ class HashSetChannel<T>(
         } else {
             ChannelResult.failure()
         }
+
+    companion object {
+        private const val EVENT_LIMIT = 100_000
+    }
 }

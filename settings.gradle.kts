@@ -1,1 +1,1 @@
-rootProject.name = "websocket-concurrent-users"
+rootProject.name = "concurrent-users"
