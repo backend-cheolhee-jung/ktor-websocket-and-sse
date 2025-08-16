@@ -6,8 +6,8 @@ import com.example.external.WriteRedisService
 import com.example.model.currentSocketConnections
 import com.example.model.previousSocketConnections
 import com.example.model.socketConnectionsMutex
-import com.example.model.currentSSEConnections
-import com.example.model.previousSSEConnections
+import com.example.model.currentSseConnections
+import com.example.model.previousSseConnections
 import com.example.model.sseConnectionsMutex
 import com.example.util.CONCURRENT_USER_KEY
 import extension.ktor.schedule
@@ -25,8 +25,8 @@ fun Application.configureConcurrentUserScheduler() {
         val event =
             socketConnectionsMutex.withLock {
                 sseConnectionsMutex.withLock {
-                    val currentUserSize = currentSocketConnections.size + currentSSEConnections.size
-                    val previousUserSize = previousSocketConnections.size + previousSSEConnections.size
+                    val currentUserSize = currentSocketConnections.size + currentSseConnections.size
+                    val previousUserSize = previousSocketConnections.size + previousSseConnections.size
                     val addedUserSize = currentUserSize - previousUserSize
 
                     val addedUserAbsoluteSize = addedUserSize.absoluteValue.toLong()
@@ -36,8 +36,8 @@ fun Application.configureConcurrentUserScheduler() {
 
                     previousSocketConnections.clear()
                     previousSocketConnections.addAll(currentSocketConnections)
-                    previousSSEConnections.clear()
-                    previousSSEConnections.addAll(currentSSEConnections)
+                    previousSseConnections.clear()
+                    previousSseConnections.addAll(currentSseConnections)
 
                     ConcurrentUserEvent(CONCURRENT_USER_KEY)
                 }

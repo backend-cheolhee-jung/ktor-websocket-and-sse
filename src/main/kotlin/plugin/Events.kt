@@ -3,7 +3,7 @@ package com.example.plugin
 import com.example.event.ConcurrentUserEvent
 import com.example.event.HashSetChannel
 import com.example.external.ReadRedisService
-import com.example.model.currentSSEConnections
+import com.example.model.currentSseConnections
 import com.example.model.currentSocketConnections
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
@@ -44,13 +44,13 @@ fun Application.configureEventConsumer() {
                 }
             }
 
-            currentSSEConnections.forEach { connection ->
+            currentSseConnections.forEach { connection ->
                 launch {
                     try {
                         connection.session.send("concurrentUserCount: $concurrentUserCount")
                     } catch (e: ClosedSendChannelException) {
                         logger.info { "SSE connection id: [${connection.sessionId}]이(가) 연결을 종료했습니다." }
-                        currentSSEConnections.remove(connection)
+                        currentSseConnections.remove(connection)
                     } catch (e: Exception) {
                         logger.error(e) { "SSE connection id: [${connection.sessionId}]에 메시지 전송 실패" }
                     }

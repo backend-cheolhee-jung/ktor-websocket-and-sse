@@ -4,8 +4,8 @@ import io.ktor.server.sse.ServerSSESession
 import kotlinx.coroutines.sync.Mutex
 
 val sseConnectionsMutex = Mutex()
-val currentSSEConnections = HashSet<SSEConnection>()
-val previousSSEConnections = HashSet<SSEConnection>()
+val currentSseConnections = HashSet<SSEConnection>()
+val previousSseConnections = HashSet<SSEConnection>()
 
 data class SSEConnection(
     val sessionId: String,
